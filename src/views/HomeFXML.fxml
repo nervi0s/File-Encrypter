@@ -23,16 +23,16 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0">
                      <children>
-                        <RadioButton mnemonicParsing="false" text="Encrypt" />
-                        <RadioButton mnemonicParsing="false" text="Decrypt" />
+                        <RadioButton fx:id="radioButtonEncrypt" mnemonicParsing="false" text="Encrypt" />
+                        <RadioButton fx:id="radioButtonDecrypt" mnemonicParsing="false" text="Decrypt" />
                      </children>
                   </VBox>
-                  <TextField prefWidth="400.0">
+                  <TextField fx:id="textFieldFileLocation" prefWidth="400.0">
                      <HBox.margin>
                         <Insets top="10.0" />
                      </HBox.margin>
                   </TextField>
-                  <Button mnemonicParsing="false" text="Choose File...">
+                  <Button mnemonicParsing="false" onAction="#chooseFile" text="Choose File...">
                      <HBox.margin>
                         <Insets left="20.0" top="10.0" />
                      </HBox.margin>
@@ -44,7 +44,7 @@
             </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="37.0" prefWidth="689.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="151.0" text="Go!" />
+                  <Button mnemonicParsing="false" onAction="#goAction" prefHeight="31.0" prefWidth="151.0" text="Go!" />
                </children>
             </HBox>
             <HBox prefHeight="259.0" prefWidth="689.0">

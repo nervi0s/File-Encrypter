@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 public class BytesReader implements Callable<byte[]> {
 
     private final int numberBytesToRead; // Bytes a leer
-    private final byte[] chunkData; // Cantidad de datos a lamacenar
+    private final byte[] chunkData; // Cantidad de datos a almacenar
     private final File file; // Archivo target
     private final Integer bytesToSkip; // Puede que tenga que saltar bytes para leer la siguiente parte del archivo
 

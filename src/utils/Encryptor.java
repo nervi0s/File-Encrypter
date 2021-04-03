@@ -3,8 +3,13 @@ package utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Encryptor {
 
@@ -14,6 +19,7 @@ public class Encryptor {
     public Encryptor(File file) throws FileNotFoundException {
         this.file = file;
         this.fis = new FileInputStream(this.file);
+        delegateTasks();
     }
 
     private void delegateTasks() {
@@ -32,6 +38,21 @@ public class Encryptor {
         //Creamos las tareas
         BytesReader readerOne = new BytesReader((int) bytesTaksOne, file);
         BytesReader readerTwo = new BytesReader((int) bytesTaskTwo, file, (int) bytesTaksOne);
+        //Lanzamos las tareas
+        Future<byte[]> futureOne = executorService.submit(readerOne);
+        Future<byte[]> futureTwo = executorService.submit(readerTwo);
+
+        try {
+            byte[] resultado1 = futureOne.get();
+            byte[] resultado2 = futureTwo.get();
+            System.out.println(Arrays.toString(resultado1));
+            System.out.println(Arrays.toString(resultado2));
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            executorService.shutdown();
+        }
+
     }
 
 }
