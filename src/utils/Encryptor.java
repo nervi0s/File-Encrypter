@@ -29,7 +29,7 @@ public class Encryptor {
 
         //Obtenemos la longitud en bytes del archivo
         long totalBytesSize = file.length();
-        System.out.printf("El hilo delegador %s obtenido un archivo de %d .%n", Thread.currentThread().getName(), totalBytesSize);
+        System.out.printf("El hilo delegador %s ha obtenido un archivo de %d bytes.%n", Thread.currentThread().getName(), totalBytesSize);
         //Obtenemos los bytes que leerá el primer hilo
         long bytesTaksOne = totalBytesSize / 2;
         //Obtenemos los bytes que leerá el segndo hilo
