@@ -19,10 +19,9 @@ public class Encryptor {
     public Encryptor(File file) throws FileNotFoundException {
         this.file = file;
         this.fis = new FileInputStream(this.file);
-        delegateTasks();
     }
 
-    private void delegateTasks() {
+    public EncryptedObject delegateTasks() {
         //Delegaremos a dos hilos que obtengan los bytes en crudo de un archivo
         //El primer hilo obtendrá la mitad y el segundo el resto
         ExecutorService executorService = Executors.newCachedThreadPool();
@@ -42,17 +41,19 @@ public class Encryptor {
         Future<byte[]> futureOne = executorService.submit(readerOne);
         Future<byte[]> futureTwo = executorService.submit(readerTwo);
 
+        EncryptedObject encryptedData = null;
         try {
             byte[] resultado1 = futureOne.get();
             byte[] resultado2 = futureTwo.get();
-            System.out.println(Arrays.toString(resultado1));
-            System.out.println(Arrays.toString(resultado2));
+            encryptedData = new EncryptedObject(resultado1, resultado2);
+            System.out.println(Arrays.toString(encryptedData.getDataOne()));
+            System.out.println(Arrays.toString(encryptedData.getDataTwo()));
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             executorService.shutdown();
         }
-
+        return encryptedData;
     }
 
 }

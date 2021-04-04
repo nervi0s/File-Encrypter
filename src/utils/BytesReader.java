@@ -31,6 +31,7 @@ public class BytesReader implements Callable<byte[]> {
     public byte[] call() throws Exception {
         System.out.printf("Hilo %s ha empezado a leer %d bytes del fichero.%n", Thread.currentThread().getName(), numberBytesToRead);
         readBytesFromFile(file);
+        Thread.sleep(5000);
         return chunkData;
     }
 
