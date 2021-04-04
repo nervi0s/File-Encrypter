@@ -8,6 +8,7 @@ package controllers;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +21,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
+import utils.EncryptedObject;
 import utils.Encryptor;
 
 /**
@@ -72,7 +74,8 @@ public class HomeFXMLController implements Initializable {
                     try {
                         // Se inician las acciones para encriptar el archivo
                         Encryptor encryptor = new Encryptor(fileTarget);
-                        encryptor.delegateTasks();
+                        EncryptedObject data = encryptor.delegateTasks(); //Cuando esta acción acabe tendremos los resultados
+                        textArea.setText(Arrays.toString(data.getDataOne()));
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -85,7 +88,7 @@ public class HomeFXMLController implements Initializable {
                     while (threadEncryptor.isAlive()) {
                         textArea.setText(textArea.getText() + "Encrypting\n");
                         try {
-                            Thread.sleep(250);
+                            Thread.sleep(500);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
                         }
