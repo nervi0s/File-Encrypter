@@ -75,7 +75,11 @@ public class HomeFXMLController implements Initializable {
                         // Se inician las acciones para encriptar el archivo
                         Encryptor encryptor = new Encryptor(fileTarget);
                         EncryptedObject data = encryptor.delegateTasks(); //Cuando esta acción acabe tendremos los resultados
-                        textArea.setText(Arrays.toString(data.getDataOne()));
+                        //Sincronizado para evitar escrituras inconsistentes
+                        synchronized (textArea) {
+                            textArea.setText("Fichero encriptado guardado en: " + encryptor.getFileDestiny());
+                        }
+
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -85,28 +89,30 @@ public class HomeFXMLController implements Initializable {
 
                 //Lanzamos un hilo para mostrar info mientras se esté encriptando el archivo
                 new Thread(() -> {
+
                     while (threadEncryptor.isAlive()) {
-                        textArea.setText(textArea.getText() + "Encrypting\n");
+                        //Sincronizado para evitar escrituras inconsistentes
+                        synchronized (textArea) {
+                            textArea.setText(textArea.getText() + "Encrypting\n");
+                        }
+
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+
                 }).start();
 
             } else if (radioButtonDecrypt.isSelected()) {
                 textArea.setText("");
-
             }
-
         }
-
     }
 
     @FXML
     private void chooseFile(ActionEvent event) {
-
         File selectedFile = fileChooser.showOpenDialog(((Button) event.getSource()).getScene().getWindow());
         if (selectedFile != null) { // Si se ha seleccionado algún archivo procedemos con las acciones
             textFieldFileLocation.setText(selectedFile.getAbsolutePath());
