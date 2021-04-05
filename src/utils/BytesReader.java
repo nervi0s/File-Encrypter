@@ -30,8 +30,8 @@ public class BytesReader implements Callable<byte[]> {
     @Override
     public byte[] call() throws Exception {
         System.out.printf("Hilo %s ha empezado a leer %d bytes del fichero.%n", Thread.currentThread().getName(), numberBytesToRead);
+        Thread.sleep(5000); // Simulación de timepo prolongado de trabajo/lectura para esta tarea
         readBytesFromFile(file);
-        Thread.sleep(5000);
         return chunkData;
     }
 
