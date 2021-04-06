@@ -2,7 +2,11 @@ package utils;
 
 import exceptions.BytesControlException;
 import exceptions.FileExtensionException;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +23,7 @@ public class Decryptor {
 
     public Decryptor(File file) throws FileExtensionException, BytesControlException {
         this.fileOrigin = file;
-        //Se obtiene la ruta del fichero target y se le quita el extensión ".encrypt"
+        //Se obtiene la ruta del fichero target y se le quita la extensión ".encrypt"
         String nameOriginFile = fileOrigin.getAbsolutePath();
         //Comprobamos que tenga la extensión correcta
         if (!nameOriginFile.endsWith(".encrypt")) {
@@ -53,9 +57,6 @@ public class Decryptor {
                 this.fileDestiny = tempFile;
             }
         }
-
-        //Leer todos los bytes execpto los 3 últimos
-        //Aplicar algotirmo a los bytes obtenidos
     }
 
     //Se controlan que los 3 últimos bytes sean los de control
@@ -70,7 +71,7 @@ public class Decryptor {
         try {
             byte[] bytes = future.get(); //Obtenemos los 3 últmos bytes
             for (int i = 0; i < bytes.length; i++) {
-                if (bytes[i] != EncryptedObject.controlByte) {
+                if (bytes[i] != EncryptedObject.CONTROL_BYTE) {
                     return false;
                 }
             }
@@ -86,7 +87,7 @@ public class Decryptor {
     }
 
     //Leer todos los bytes execpto los 3 últimos
-    public EncryptedObject delegateTaks() {
+    public EncryptedObject delegateTasks() {
         //Delegaremos a dos hilos que obtengan los bytes cifrados de un archivo
         //El primer hilo obtendrá la mitad y el segundo el resto
         ExecutorService executorService = Executors.newCachedThreadPool();
@@ -127,24 +128,56 @@ public class Decryptor {
     public byte[] restoreBytes(EncryptedObject objEncrypted) {
         //Primero recreamos los bytes en un solo objeto
         List<Byte> byteList = new ArrayList<>();
-        //Añadimos los primeros bytes
-        for (Byte aByte : objEncrypted.getDataOne()) {
+        //Añadimos los primeros bytes pero ya modificados para ser como los originales
+        for (Byte aByte : modifyBytes(objEncrypted.getDataOne())) {
             byteList.add(aByte);
         }
-        //Añadimos los últimos bytes
-        for (Byte aByte : objEncrypted.getDataTwo()) {
+        //Añadimos los últimos bytes también modificados para ser como los originales
+        for (Byte aByte : modifyBytes(objEncrypted.getDataTwo())) {
             byteList.add(aByte);
         }
-        //Convertimos la lista en un array y la devolvemos
+        //Convertimos la lista en un array 
         byte[] allBytes = new byte[byteList.size()];
         for (int i = 0; i < byteList.size(); i++) {
             allBytes[i] = byteList.get(i);
         }
+        //Devolvemos el bytes originales
         return allBytes;
     }
 
     //Se reonstruye el archivo original
-    public void restoreFile(byte[] bytesToWite) {
-
+    public void restoreFile(byte[] bytesToWrite) {
+        try {
+            BufferedOutputStream bof = new BufferedOutputStream(new FileOutputStream(fileDestiny));
+            bof.write(bytesToWrite);
+            bof.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Decryptor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Decryptor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
+    //Método para obtener la ruta del fichero descriptado
+    public String getFileDestiny() {
+        return fileDestiny.getAbsolutePath();
+    }
+
+    //Método para restaurar los bytes a su estado original
+    private byte[] modifyBytes(byte[] encriptedBytes) {
+        for (int i = 0; i < encriptedBytes.length; i++) {
+            byte byteActual = encriptedBytes[i];
+
+            if (i % 2 == 0) { // Si el byte actual ocupa una posicón par en el array
+                byteActual -= 3;
+            } else { // Si el byte actual ocupa una posicón impar en el array
+                byteActual += 5;
+            }
+            // El byte actual quedará modificado
+            encriptedBytes[i] = byteActual;
+        }
+        //Devolvemos el bytes originales
+        return encriptedBytes;
+    }
+
 }
