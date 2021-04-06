@@ -49,7 +49,7 @@ public class Encryptor {
         try {
             byte[] resultado1 = futureOne.get();
             byte[] resultado2 = futureTwo.get();
-            encryptedData = new EncryptedObject(resultado1, resultado2);
+            encryptedData = new EncryptedObject(modifyBytes(resultado1), modifyBytes(resultado2));
 
             //System.out.println(Arrays.toString(encryptedData.getDataOne()));
             //System.out.println(Arrays.toString(encryptedData.getDataTwo()));
@@ -78,6 +78,31 @@ public class Encryptor {
         }
     }
 
+    //Método para modificar cada byte según critero
+    private byte[] modifyBytes(byte[] rawBytes) {
+        for (int i = 0; i < rawBytes.length; i++) {
+            byte byteActual = rawBytes[i];
+
+            if (byteActual % 2 == 0) { // Si el byte actual es par
+                if (byteActual >= 0) { //Si es positivo
+                    byteActual -= 3;
+                } else { // Si es negativo
+                    byteActual += 3;
+                }
+            } else { // Si el byte actual es impar
+                if (byteActual >= 0) { //Si es positivo
+                    byteActual -= 5;
+                } else { // Si es negativo
+                    byteActual += 5;
+                }
+            }
+            // El byte actual quedará modificado
+            rawBytes[i] = byteActual;
+        }
+        return rawBytes;
+    }
+
+    //Método para obtener la ruta del fichero encriptado
     public String getFileDestiny() {
         return fileDestiny.getAbsolutePath();
     }
