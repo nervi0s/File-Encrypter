@@ -32,6 +32,8 @@ public class EncryptedObject {
         for (byte byte_ : getDataTwo()) {
             bytesList.add(byte_);
         }
+        // Se añaden los bytes de control
+        putControlBytes(bytesList);
         // Se convierte la lista en array para su retorno
         byte[] allbytes = new byte[bytesList.size()];
         for (int i = 0; i < bytesList.size(); i++) {
@@ -40,4 +42,11 @@ public class EncryptedObject {
         return allbytes;
     }
 
+    //Método para añadir al final del archivo bytes de control
+    public void putControlBytes(List<Byte> bytesList) {
+        //Se pondrá al final del archivo 3 bytes del tipo 10000001 (129) que servirán como control para desencriptar
+        bytesList.add((byte) 129);
+        bytesList.add((byte) 129);
+        bytesList.add((byte) 129);
+    }
 }
