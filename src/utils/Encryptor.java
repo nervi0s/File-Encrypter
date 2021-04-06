@@ -1,7 +1,6 @@
 package utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,11 +16,9 @@ public class Encryptor {
 
     private final File fileOrigin;
     private final File fileDestiny;
-    private final FileInputStream fis;
 
     public Encryptor(File file) throws FileNotFoundException {
         this.fileOrigin = file;
-        this.fis = new FileInputStream(this.fileOrigin);
         this.fileDestiny = new File(fileOrigin.getAbsolutePath() + ".encrypt");
     }
 
@@ -35,7 +32,7 @@ public class Encryptor {
         System.out.printf("El hilo delegador %s ha obtenido un archivo de %d bytes.%n", Thread.currentThread().getName(), totalBytesSize);
         //Obtenemos los bytes que leerá el primer hilo
         long bytesTaksOne = totalBytesSize / 2;
-        //Obtenemos los bytes que leerá el segndo hilo
+        //Obtenemos los bytes que leerá el segundo hilo
         long bytesTaskTwo = totalBytesSize - bytesTaksOne;
 
         //Creamos las tareas
@@ -83,18 +80,10 @@ public class Encryptor {
         for (int i = 0; i < rawBytes.length; i++) {
             byte byteActual = rawBytes[i];
 
-            if (byteActual % 2 == 0) { // Si el byte actual es par
-                if (byteActual >= 0) { //Si es positivo
-                    byteActual -= 3;
-                } else { // Si es negativo
-                    byteActual += 3;
-                }
-            } else { // Si el byte actual es impar
-                if (byteActual >= 0) { //Si es positivo
-                    byteActual -= 5;
-                } else { // Si es negativo
-                    byteActual += 5;
-                }
+            if (i % 2 == 0) { // Si el byte actual ocupa una posicón par en el array
+                byteActual += 3;
+            } else { // Si el byte actual ocupa una posicón impar en el array
+                byteActual -= 5;
             }
             // El byte actual quedará modificado
             rawBytes[i] = byteActual;
