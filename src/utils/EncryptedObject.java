@@ -7,6 +7,7 @@ public class EncryptedObject {
 
     private final byte[] dataOne;
     private final byte[] dataTwo;
+    public static final byte controlByte = (byte) 129;
 
     public EncryptedObject(byte[] data1, byte[] data2) {
         dataOne = data1;
@@ -44,9 +45,9 @@ public class EncryptedObject {
 
     //Método para añadir al final del archivo bytes de control
     public void putControlBytes(List<Byte> bytesList) {
-        //Se pondrá al final del archivo 3 bytes del tipo 10000001 (129) que servirán como control para desencriptar
-        bytesList.add((byte) 129);
-        bytesList.add((byte) 129);
-        bytesList.add((byte) 129);
+        //Se pondrá al final del archivo 3 bytes del tipo 10000001 (129) ó en Java (-127) que servirán como control para desencriptar
+        bytesList.add(controlByte);
+        bytesList.add(controlByte);
+        bytesList.add(controlByte);
     }
 }
