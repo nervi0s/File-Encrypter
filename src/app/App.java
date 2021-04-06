@@ -25,11 +25,6 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        try {
-            Encryptor e = new Encryptor(new File("./src/views/HomeFXML.fxml"));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
 }
