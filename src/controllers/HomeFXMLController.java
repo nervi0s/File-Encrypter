@@ -5,6 +5,8 @@
  */
 package controllers;
 
+import exceptions.BytesControlException;
+import exceptions.FileExtensionException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -21,6 +23,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
+import utils.Decryptor;
 import utils.EncryptedObject;
 import utils.Encryptor;
 
@@ -95,7 +98,6 @@ public class HomeFXMLController implements Initializable {
                         synchronized (textArea) {
                             textArea.setText(textArea.getText() + "Encrypting\n");
                         }
-
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ex) {
@@ -107,6 +109,49 @@ public class HomeFXMLController implements Initializable {
 
             } else if (radioButtonDecrypt.isSelected()) {
                 textArea.setText("");
+
+                //Lanzamos un nuevo hilo para que la aplicación no sea bloqueante
+                Thread threadDecryptor = new Thread(() -> {
+                    try {
+                        // Se inician las acciones para desencriptar el archivo
+                        Decryptor decryptor = new Decryptor(fileTarget);
+                        EncryptedObject data = decryptor.delegateTasks(); //Cuando esta acción acabe tendremos los resultados
+                        //Restauramos los bytes del archivo
+                        byte[] clearBytes = decryptor.restoreBytes(data);
+                        //Creamos el archivo limpio
+                        decryptor.restoreFile(clearBytes);
+                        //Sincronizado para evitar escrituras inconsistentes
+                        synchronized (textArea) {
+                            textArea.setText("Fichero encriptado guardado en: " + decryptor.getFileDestiny());
+                        }
+
+                    } catch (FileExtensionException ex) {
+                        Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                        textArea.setText(ex.getMessage());
+                    } catch (BytesControlException ex) {
+                        Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                        textArea.setText(ex.getMessage());
+                    }
+
+                });
+                threadDecryptor.start(); // Lanzamos el hilo creado
+
+                //Lanzamos un hilo para mostrar info mientras se esté encriptando el archivo
+                new Thread(() -> {
+
+                    while (threadDecryptor.isAlive()) {
+                        //Sincronizado para evitar escrituras inconsistentes
+                        synchronized (textArea) {
+                            textArea.setText(textArea.getText() + "Decrypting\n");
+                        }
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(HomeFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                }).start();
             }
         }
     }
@@ -116,9 +161,6 @@ public class HomeFXMLController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(((Button) event.getSource()).getScene().getWindow());
         if (selectedFile != null) { // Si se ha seleccionado algún archivo procedemos con las acciones
             textFieldFileLocation.setText(selectedFile.getAbsolutePath());
-        } else {
-
         }
     }
-
 }
